@@ -7,18 +7,23 @@ import SelectedCell from "./components/SelectedCell";
 
 function App() {
 
-  const [word, setWord] = useState("Words");
+  const [word, setWord] = useState("words");
   const [showHint, setShowHint] = useState(true);
   const [currentPos, setCurrentPos] = useState(0);
   const [score, setSocre] = useState(0);
   const [level, setLevel] = useState(1);
   
   const [createdWord, setCreatedWord] = useState(Array(word.length).fill(""));
-  const [letters, setLettters] = useState(word.toUpperCase().split(""))
+  const [letters, setLettters] = useState(suffleLetters(word.toUpperCase().split("")))
 
   // const letters = word.toUpperCase().split("");
 
   // const createdWord = ["W","O","","",""];
+  
+  // Check for winning condition 
+  if(letters.length === currentPos){
+    checkResult();
+  }
   
   // Handler functions
   // Add the letter to create word and remove it from letters array
@@ -35,9 +40,36 @@ function App() {
         newCreateWord[i] = letter;
         setCreatedWord(newCreateWord);
         setLettters(newLetters);
-        break;
+        setCurrentPos(pos => pos+1);
+        return;
       }
     }
+  }
+
+  // Suffling the letters 
+  function suffleLetters(letters) {
+    let suffledLetters = [...letters];
+    let j = 0;
+    for(let i = 0; i < suffledLetters.length; i++){
+      j = Math.floor(Math.random() * (suffledLetters.length - 1));
+      [suffledLetters[i], suffledLetters[j]] = [suffledLetters[j], suffledLetters[i]];
+
+    }
+    return suffledLetters;
+  }
+
+  // Check the result form the array
+  function checkResult() {
+    console.log(`I'm Checking the result Letter: ${letters.length} and ${currentPos}`);
+    let playerWord = "";
+    for(let i =0; i < createdWord.length; i++){
+      playerWord = playerWord + createdWord[i];
+    }
+
+    if(playerWord.toLowerCase() === word)
+      console.log("Player wins");
+    else 
+      console.log("Player loses");
   }
 
   return (
