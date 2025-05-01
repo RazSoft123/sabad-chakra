@@ -46,6 +46,24 @@ function App() {
     }
   }
 
+  function handleRemoveLetter(letter, pos) {
+    console.log("Handle remove letter clicked");
+    let newLetters = [...letters];
+    let newCreateWord = [...createdWord];
+    newCreateWord[pos] = "";
+
+
+    for(let i=0; i<letters.length; i++){
+      if(letters[i] === ""){
+        newLetters[i] = letter;
+        setCreatedWord(newCreateWord);
+        setLettters(newLetters);
+        setCurrentPos(pos => pos-1);
+        return;
+      }
+    }
+  }
+
   // Suffling the letters 
   function suffleLetters(letters) {
     let suffledLetters = [...letters];
@@ -87,7 +105,7 @@ function App() {
 
         <div className="flex flex-col gap-4 relative">
           <div className="flex justify-around items-center mb-3">
-            {createdWord.map((letter, index) => letter === "" ? <EmptyCell key={index} /> : <SelectedCell key={index} letter={letter} />)}
+            {createdWord.map((letter, index) => letter === "" ? <EmptyCell key={index} /> : <SelectedCell handleClick={handleRemoveLetter} key={index} pos={index} letter={letter} />)}
           </div>
 
           <div className="flex justify-around items-center mt-6">
