@@ -9,6 +9,8 @@ import levelData from './data/word_data';
 import { suffleLetters } from './utils/utilities';
 import ModalWindow from './components/ModalWindow';
 import WinModal from './components/WinModal';
+import CorrectWordModal from './components/CorrectWordModal';
+import IncorrectWordModal from './components/IncorrectWordModal';
 
 function reducer(state, action) {
   switch(action.type){
@@ -137,7 +139,7 @@ function App() {
   return (
       <div className="flex items-center justify-center bg-linear-to-br from-primary-500 to-skyblue-500 w-full h-full">
         <ModalWindow visibility={true}> 
-          <WinModal />
+          <IncorrectWordModal />
         </ModalWindow>
         <div className="max-w-[600px] w-[300px] mt-4 mb-16 h-[80%] flex flex-col items-center justify-between">
           {
