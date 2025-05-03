@@ -3,11 +3,12 @@ import { useReducer, useState } from "react";
 import EmptyCell from "./components/EmptyCell";
 import LetterCell from "./components/LetterCell";
 import SelectedCell from "./components/SelectedCell";
-import GameProvider, { GameContext } from "./components/GameProvider";
 import MainMenu from "./components/MainMenu";
 import TopLabelContainer from "./components/TopLabelContainer";
 import levelData from './data/word_data';
 import { suffleLetters } from './utils/utilities';
+import ModalWindow from './components/ModalWindow';
+import WinModal from './components/WinModal';
 
 function reducer(state, action) {
   switch(action.type){
@@ -53,6 +54,7 @@ const initialState = {
   letters: suffleLetters(levelData.levels[0].words[0].word.toUpperCase().split("")),
   currentPos: 0,
   createdWord: Array(levelData.levels[0].words[0].word.length).fill(""),
+  modalVisibility: false,
 }
 
 function App() {
@@ -134,6 +136,9 @@ function App() {
 
   return (
       <div className="flex items-center justify-center bg-linear-to-br from-primary-500 to-skyblue-500 w-full h-full">
+        <ModalWindow visibility={true}> 
+          <WinModal />
+        </ModalWindow>
         <div className="max-w-[600px] w-[300px] mt-4 mb-16 h-[80%] flex flex-col items-center justify-between">
           {
             !playing ? 
