@@ -1,113 +1,47 @@
 import Hint from './components/Hint';
-import { useReducer, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import EmptyCell from "./components/EmptyCell";
 import LetterCell from "./components/LetterCell";
 import SelectedCell from "./components/SelectedCell";
 import MainMenu from "./components/MainMenu";
 import TopLabelContainer from "./components/TopLabelContainer";
-import levelData from './data/word_data';
-import { suffleLetters } from './utils/utilities';
 import ModalWindow from './components/ModalWindow';
 import WinModal from './components/WinModal';
 import CorrectWordModal from './components/CorrectWordModal';
 import IncorrectWordModal from './components/IncorrectWordModal';
-
-function reducer(state, action) {
-  switch(action.type){
-    case 'game/loadNewWord':
-      {
-        const newWordPos = state.levelWordPos + 1;
-        return { ...state, 
-          levelWordPos: newWordPos,
-          word: levelData.levels[state.level].words[newWordPos].word,
-          description: levelData.levels[state.level].words[newWordPos].desc,
-          score: state.score + 1,
-          letters: suffleLetters(levelData.levels[state.level].words[newWordPos].word.toUpperCase().split("")),
-          currentPos: 0,
-          createdWord: Array(levelData.levels[state.level].words[newWordPos].word.length).fill(""),
-          modalVisibility: false,
-          modalChild: "",
-        } 
-      }
-
-    case 'game/loadSameWord': 
-      return {
-        ...state,
-        letters: suffleLetters(levelData.levels[state.level].words[state.levelWordPos].word.toUpperCase().split("")),
-        currentPos: 0,
-        createdWord: Array(levelData.levels[state.level].words[state.levelWordPos].word.length).fill(""),
-        modalVisibility: false,
-        modalChild: "",
-      }
-
-    case 'game/addLetter' :
-      return {
-        ...state,
-        letters: action.payload.letters,
-        createdWord: action.payload.createdWord,
-        currentPos: state.currentPos + 1,
-      }
-
-    case 'game/removeLetter' :
-      return {
-        ...state,
-        letters: action.payload.letters,
-        createdWord: action.payload.createdWord,
-        currentPos: state.currentPos - 1,
-      }
-
-    case 'game/setWordCorrect' :
-      return {
-        ...state,
-        modalVisibility: true,
-        modalChild: 'setCorrectWord',
-        currentPos: 0,
-      }
-
-    case 'game/setWordIncorrect' :
-      return {
-        ...state,
-        modalVisibility: true,
-        modalChild: 'setIncorrectWord',
-        currentPos: 0,
-      }
-
-    default :
-
-      break;
-  }
-}
-
-const initialState = {
-  word: levelData.levels[0].words[0].word,
-  description: levelData.levels[0].words[0].desc,
-  levelWordPos: 0,
-  level: 0,
-  levelWordCount: levelData.levels[0].words.length,
-  score: 0,
-  letters: suffleLetters(levelData.levels[0].words[0].word.toUpperCase().split("")),
-  currentPos: 0,
-  createdWord: Array(levelData.levels[0].words[0].word.length).fill(""),
-  modalVisibility: false,
-  modalChild: "",
-}
+import { GameContext } from './components/GameProvider';
 
 function App() {
 
-  const [state, dispatch] = useReducer(reducer, initialState);
+  // const [state, dispatch] = useReducer(gameReducer, gameInitialState);
+  const {state, dispatch} = useContext(GameContext);
   const [playing, setPlaying] = useState(false);
 
-  
+  useEffect(() => {
+    
+      // Check the result form the array
+  function checkResult() {
+    let playerWord = "";
+    for(let i =0; i < state.createdWord.length; i++){
+      playerWord = playerWord + state.createdWord[i];
+    }
 
-  console.log("Word is : ", state.word);
-  console.log("Desc is : ", state.description);
-  console.log("Current pos is : ", state.currentPos);
-
-  // Check for winning condition 
-  if(state.letters.length === state.currentPos){
-    checkResult();
+    if(playerWord.toLowerCase() === state.word){
+      console.log("Player wins");
+      dispatch({type: 'game/setWordCorrect'});
+    }
+    else {
+      dispatch({type: 'game/setWordIncorrect'})
+      console.log(`player loses ${playerWord.toLowerCase()} : ${state.word}`);
+    }
   }
-  
+    // Check for winning condition
+    if(state.letters.length === state.currentPos){
+      checkResult();
+    }
+    
+  }, [state.letters.length, state.currentPos, dispatch, state.word, state.createdWord]);
+
   // Handler functions
   // Add the letter to create word and remove it from letters array
   function handleAddLetter(pos, letters){
@@ -133,7 +67,6 @@ function App() {
     let newCreateWord = [...state.createdWord];
     newCreateWord[pos] = "";
 
-
     for(let i=0; i<state.letters.length; i++){
       if(state.letters[i] === ""){
         newLetters[i] = letter;
@@ -141,27 +74,6 @@ function App() {
         return;
       }
     }
-  }
-
-  // Check the result form the array
-  function checkResult() {
-    console.log(`I'm Checking the result Letter: ${state.letters.length} and ${state.currentPos}`);
-    let playerWord = "";
-    for(let i =0; i < state.createdWord.length; i++){
-      playerWord = playerWord + state.createdWord[i];
-    }
-    console.log(`player loses ${playerWord.toLowerCase()} : ${state.word}`);
-
-    if(playerWord.toLowerCase() === state.word){
-      console.log("Player wins");
-      // dispatch({type: 'game/loadNewWord'});
-      dispatch({type: 'game/setWordCorrect'});
-    }
-    else {
-      dispatch({type: 'game/setWordIncorrect'})
-      console.log(`player loses ${playerWord.toLowerCase()} : ${state.word}`);
-    }
-
   }
 
   return (

@@ -3,7 +3,7 @@ import { GameContext } from "./GameProvider"
 import TopLabel from "./TopLable";
 
 export default function TopLabelContainer() {
-    const {score, level} = useContext(GameContext);
+    const {state: {score, level}} = useContext(GameContext);
     return (
         <div className="flex items-center justify-between w-full">
             <TopLabel name="Level" value={level + 1} />

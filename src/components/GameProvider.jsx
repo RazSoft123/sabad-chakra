@@ -1,15 +1,13 @@
-import { createContext, useState } from "react"
+import { createContext, useReducer } from "react"
+import { initialState, reducer } from "../reducers/gameReducer";
 
 export const GameContext = createContext();
 
 export default function GameProvider({children}) { 
-    const [score, setScore] = useState(0);
-    const [level, setLevel] = useState(0);
+    const [state, dispatch] = useReducer(reducer, initialState);
     
     return (
-        <GameContext.Provider value={
-            {score, setScore, level, setLevel}
-        }>
+        <GameContext.Provider value={{ state, dispatch }}>
             {children}
         </GameContext.Provider>
     )
