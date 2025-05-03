@@ -15,14 +15,29 @@ import IncorrectWordModal from './components/IncorrectWordModal';
 function reducer(state, action) {
   switch(action.type){
     case 'game/loadNewWord':
-      return { ...state, 
-        levelWordPos: state.levelWordPos + 1,
-        word: levelData.levels[state.level].words[state.levelWordPos].word,
-        description: levelData.levels[state.level].words[state.levelWordPos].desc,
-        score: state.score + 1,
+      {
+        const newWordPos = state.levelWordPos + 1;
+        return { ...state, 
+          levelWordPos: newWordPos,
+          word: levelData.levels[state.level].words[newWordPos].word,
+          description: levelData.levels[state.level].words[newWordPos].desc,
+          score: state.score + 1,
+          letters: suffleLetters(levelData.levels[state.level].words[newWordPos].word.toUpperCase().split("")),
+          currentPos: 0,
+          createdWord: Array(levelData.levels[state.level].words[newWordPos].word.length).fill(""),
+          modalVisibility: false,
+          modalChild: "",
+        } 
+      }
+
+    case 'game/loadSameWord': 
+      return {
+        ...state,
         letters: suffleLetters(levelData.levels[state.level].words[state.levelWordPos].word.toUpperCase().split("")),
         currentPos: 0,
-        createdWord: Array(levelData.levels[0].words[0].word.length).fill(""),
+        createdWord: Array(levelData.levels[state.level].words[state.levelWordPos].word.length).fill(""),
+        modalVisibility: false,
+        modalChild: "",
       }
 
     case 'game/addLetter' :
@@ -32,14 +47,31 @@ function reducer(state, action) {
         createdWord: action.payload.createdWord,
         currentPos: state.currentPos + 1,
       }
+
     case 'game/removeLetter' :
       return {
         ...state,
         letters: action.payload.letters,
         createdWord: action.payload.createdWord,
         currentPos: state.currentPos - 1,
-
       }
+
+    case 'game/setWordCorrect' :
+      return {
+        ...state,
+        modalVisibility: true,
+        modalChild: 'setCorrectWord',
+        currentPos: 0,
+      }
+
+    case 'game/setWordIncorrect' :
+      return {
+        ...state,
+        modalVisibility: true,
+        modalChild: 'setIncorrectWord',
+        currentPos: 0,
+      }
+
     default :
 
       break;
@@ -57,19 +89,12 @@ const initialState = {
   currentPos: 0,
   createdWord: Array(levelData.levels[0].words[0].word.length).fill(""),
   modalVisibility: false,
+  modalChild: "",
 }
 
 function App() {
 
   const [state, dispatch] = useReducer(reducer, initialState);
-  
-  // // All the work related to level
-  // // const {word, desc: description} = levelData.levels[level].words[0];
-  // const [word, setWord] = useState(levelData.levels[level].words[0].word);
-  // const [description, setDescription] = useState(levelData.levels[level].words[0].desc);
-  // const [levelWordPos, setLevelWordPos] = useState(0);
-  // const levelWordCount = levelData.levels[level].words.length;
-
   const [playing, setPlaying] = useState(false);
 
   
@@ -129,18 +154,23 @@ function App() {
 
     if(playerWord.toLowerCase() === state.word){
       console.log("Player wins");
-      dispatch({type: 'game/loadNewWord'});
+      // dispatch({type: 'game/loadNewWord'});
+      dispatch({type: 'game/setWordCorrect'});
     }
-    else 
+    else {
+      dispatch({type: 'game/setWordIncorrect'})
       console.log(`player loses ${playerWord.toLowerCase()} : ${state.word}`);
+    }
 
   }
 
   return (
       <div className="flex items-center justify-center bg-linear-to-br from-primary-500 to-skyblue-500 w-full h-full">
-        <ModalWindow visibility={true}> 
-          <IncorrectWordModal />
-        </ModalWindow>
+        <ModalWindow visibility={state.modalVisibility}>
+          {state.modalChild === "setCorrectWord" && <CorrectWordModal dispatch={dispatch} />}
+          {state.modalChild === "setIncorrectWord" && <IncorrectWordModal dispatch={dispatch} />}
+          {state.modalChild === "setWin" && <WinModal dispatch={dispatch} />}
+        </ModalWindow> 
         <div className="max-w-[600px] w-[300px] mt-4 mb-16 h-[80%] flex flex-col items-center justify-between">
           {
             !playing ? 
