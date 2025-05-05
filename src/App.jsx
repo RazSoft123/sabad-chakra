@@ -1,5 +1,5 @@
 import Hint from './components/Hint';
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect} from "react";
 import EmptyCell from "./components/EmptyCell";
 import LetterCell from "./components/LetterCell";
 import SelectedCell from "./components/SelectedCell";
@@ -10,13 +10,12 @@ import WinModal from './components/WinModal';
 import CorrectWordModal from './components/CorrectWordModal';
 import IncorrectWordModal from './components/IncorrectWordModal';
 import { GameContext } from './components/GameProvider';
+import GameEndModal from './components/GameEndModal';
 
 function App() {
 
   // const [state, dispatch] = useReducer(gameReducer, gameInitialState);
   const {state, dispatch} = useContext(GameContext);
-  const [playing, setPlaying] = useState(false);
-
   useEffect(() => {
     
       // Check the result form the array
@@ -27,7 +26,16 @@ function App() {
     }
 
     if(playerWord.toLowerCase() === state.word){
-      console.log("Player wins");
+      console.log(`Player wins levelWordPos : ${state.levelWordPos} Level Word Count: ${state.levelWordCount}`);
+
+      if(state.levelWordPos === state.levelWordCount-1){
+        
+        if(state.level === state.levelLength - 1) {
+          return dispatch({type: 'game/setGameEnd'})
+        }
+        return dispatch({type: 'game/setLevelWin'});
+      }
+
       dispatch({type: 'game/setWordCorrect'});
     }
     else {
@@ -40,7 +48,7 @@ function App() {
       checkResult();
     }
     
-  }, [state.letters.length, state.currentPos, dispatch, state.word, state.createdWord]);
+  }, [state.letters.length, state.currentPos, dispatch, state.word, state.createdWord, state.levelWordPos,state.levelWordCount, state.level, state.levelLength]);
 
   // Handler functions
   // Add the letter to create word and remove it from letters array
@@ -82,11 +90,12 @@ function App() {
           {state.modalChild === "setCorrectWord" && <CorrectWordModal dispatch={dispatch} />}
           {state.modalChild === "setIncorrectWord" && <IncorrectWordModal dispatch={dispatch} />}
           {state.modalChild === "setWin" && <WinModal dispatch={dispatch} />}
+          {state.modalChild === "gameEnd" && <GameEndModal />}
         </ModalWindow> 
         <div className="max-w-[600px] w-[300px] mt-4 mb-16 h-[80%] flex flex-col items-center justify-between">
           {
-            !playing ? 
-              <MainMenu setPlaying={setPlaying} /> : 
+            !state.playing ? 
+              <MainMenu /> : 
             <>
             <TopLabelContainer />
             <div className="h-full mt-10">

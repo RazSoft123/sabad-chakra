@@ -9,9 +9,9 @@ const levelData =  {
         },
         {
             words : [
-                {word: "", "description": "We do prayer to"},
-                {"word": "dog", "description": "four leged animal"},
-                {"word": "sky", "description": "you see it, when you look up"}
+                {word: "owl", desc: "A night bird"},
+                {word: "rat", desc : "the race we are in"},
+                {word: "bat", desc: "use for playing"}
             ]
         }
     ]
