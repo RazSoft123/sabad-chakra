@@ -14,11 +14,10 @@ import GameEndModal from './components/GameEndModal';
 
 function App() {
 
-  // const [state, dispatch] = useReducer(gameReducer, gameInitialState);
   const {state, dispatch} = useContext(GameContext);
   useEffect(() => {
     
-      // Check the result form the array
+  // Check the result form the array
   function checkResult() {
     let playerWord = "";
     for(let i =0; i < state.createdWord.length; i++){
@@ -26,7 +25,6 @@ function App() {
     }
 
     if(playerWord.toLowerCase() === state.word){
-      console.log(`Player wins levelWordPos : ${state.levelWordPos} Level Word Count: ${state.levelWordCount}`);
 
       if(state.levelWordPos === state.levelWordCount-1){
         
@@ -40,7 +38,6 @@ function App() {
     }
     else {
       dispatch({type: 'game/setWordIncorrect'})
-      console.log(`player loses ${playerWord.toLowerCase()} : ${state.word}`);
     }
   }
     // Check for winning condition
@@ -53,7 +50,6 @@ function App() {
   // Handler functions
   // Add the letter to create word and remove it from letters array
   function handleAddLetter(pos, letters){
-    console.log("Handle Add letter clicked");
     const letter = letters[pos];
     let newLetters = [...letters];
     newLetters[pos] = "";
@@ -70,7 +66,6 @@ function App() {
   }
 
   function handleRemoveLetter(letter, pos) {
-    console.log("Handle remove letter clicked");
     let newLetters = [...state.letters];
     let newCreateWord = [...state.createdWord];
     newCreateWord[pos] = "";
